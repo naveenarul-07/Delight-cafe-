@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Castle Cafe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="home-page contact-page">
+
+    <header class="nav">
+        <div class="logo">Castle Cafe</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you! We will get back to you soon.');">
+        <h2>Contact Us</h2>
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <textarea rows="4" placeholder="Your Message" required></textarea>
+        <button type="submit">Send</button>
+    </form>
+
+    <footer>
+        <p>&copy; 2025 Castle Cafe. All rights reserved.</p>
+        <button id="logoutBtn" class="footer-logout" type="button" onclick="logout()" style="display:none">Logout</button>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

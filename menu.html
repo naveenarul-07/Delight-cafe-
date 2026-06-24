@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu | Castle Cafe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="menu-page">
+
+    <header class="nav">
+        <div class="logo">Castle Cafe</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <h2 class="page-title">Our Menu</h2>
+
+    <div class="menu-items" id="menuItems"></div>
+
+    <footer>
+        <p>&copy; 2025 Castle Cafe. All rights reserved.</p>
+        <button id="logoutBtn" class="footer-logout" type="button" onclick="logout()" style="display:none">Logout</button>
+    </footer>
+
+    <div class="cart-fixed-panel">
+        <button class="cart-toggle-btn" id="cartToggleBtn" type="button" onclick="toggleCart()">
+            My Cart <span id="cartBadge" class="cart-badge"></span>
+        </button>
+
+        <aside class="menu-cart" id="menuCart">
+            <div class="cart-header">
+                <h3>My Cart</h3>
+                <button class="cart-close" type="button" onclick="toggleCart()">&times;</button>
+            </div>
+
+            <section class="cart-section">
+                <h4>Added Items</h4>
+                <p id="emptyMsg" class="empty-msg">Your cart is empty</p>
+                <ul id="orderList" class="order-list"></ul>
+                <div id="cartTotal" class="cart-total"></div>
+                <button id="confirmOrderBtn" class="confirm-order-btn" type="button" onclick="confirmOrder()" style="display:none">Confirm Order</button>
+                <button class="clear-btn" type="button" onclick="clearOrders()">Clear Cart</button>
+            </section>
+        </aside>
+    </div>
+    <script src="menu-data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
