@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Madras Cold Coffee",
+    "price": 120,
+    "image": "images/milkshakes/cold-coffee.jpg"
+  },
+  {
+    "name": "Chilled Filter Kaapi",
+    "price": 99,
+    "image": "images/milkshakes/cold-coffee.jpg"
+  },
+  {
+    "name": "Chocolate Kaapi",
+    "price": 145,
+    "image": "images/milkshakes/chocolate-milkshake.jpg"
+  },
+  {
+    "name": "Caramel Kaapi",
+    "price": 155,
+    "image": "images/milkshakes/cold-coffee.jpg"
+  },
+  {
+    "name": "Rose Milk (Chilled)",
+    "price": 95,
+    "image": "images/beverages/rose-milk.png?v=2"
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "name": "Dream Cake",
+    "price": 85,
+    "image": "images/desserts/dream-cake.jpg"
+  },
+  {
+    "name": "Choco Pudding",
+    "price": 100,
+    "image": "images/desserts/choco-pudding.png"
+  },
+  {
+    "name": "Brownie",
+    "price": 80,
+    "image": "images/desserts/brownie.jpg"
+  },
+  {
+    "name": "Ice Cream Brownie",
+    "price": 130,
+    "image": "images/desserts/ice-cream-brownie.png"
+  },
+  {
+    "name": "Sizzling Brownie",
+    "price": 180,
+    "image": "images/desserts/sizzling-brownie.png"
+  },
+  {
+    "name": "Choco Lava",
+    "price": 80,
+    "image": "images/desserts/choco-lava.jpg"
+  },
+  {
+    "name": "Honey Cake Slice",
+    "price": 195,
+    "image": "images/desserts/honey-cake-slice.png"
+  },
+  {
+    "name": "Belgian Chocolate Cake",
+    "price": 255,
+    "image": "images/desserts/belgian-chocolate-cake.png?v=2"
+  },
+  {
+    "name": "Sizzling Brownie with Ice Cream",
+    "price": 195,
+    "image": "images/starters/sizzling-brownie.jpg"
+  },
+  {
+    "name": "Falooda",
+    "price": 165,
+    "image": "images/desserts/falooda.jpg"
+  },
+  {
+    "name": "Jigarthanda",
+    "price": 120,
+    "image": "images/desserts/jigarthanda.jpg"
+  },
+  {
+    "name": "Gulab Jamun (2 pcs)",
+    "price": 95,
+    "image": "images/sweets/gulab-jamun.png?v=2"
+  },
+  {
+    "name": "Rasmalai (2 pcs)",
+    "price": 110,
+    "image": "images/sweets/rasmalai.jpg"
+  }
+]

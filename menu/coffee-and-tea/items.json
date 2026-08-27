@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Tea",
+    "price": 25,
+    "image": "images/coffee/tea.png"
+  },
+  {
+    "name": "Coffee",
+    "price": 30,
+    "image": "images/coffee/coffee.jpg"
+  },
+  {
+    "name": "Black Coffee",
+    "price": 25,
+    "image": "images/coffee/black-coffee.png"
+  },
+  {
+    "name": "Black Tea",
+    "price": 25,
+    "image": "images/coffee/black-tea.png"
+  },
+  {
+    "name": "Delight Cafe Special Coffee",
+    "price": 45,
+    "image": "images/coffee/delight-cafe-special-coffee.png"
+  },
+  {
+    "name": "Madras Filter Kaapi",
+    "price": 45,
+    "image": "images/coffee/filter-kaapi.jpg"
+  },
+  {
+    "name": "Degree Kaapi",
+    "price": 55,
+    "image": "images/coffee/filter-kaapi.jpg"
+  },
+  {
+    "name": "Strong Filter Kaapi",
+    "price": 65,
+    "image": "images/coffee/filter-kaapi.jpg"
+  },
+  {
+    "name": "Espresso Shot",
+    "price": 95,
+    "image": "images/coffee/espresso.jpg"
+  },
+  {
+    "name": "Inji Tea (Ginger)",
+    "price": 30,
+    "image": "images/coffee/inji-tea.png?v=2"
+  },
+  {
+    "name": "Yelakkai Tea (Cardamom)",
+    "price": 30,
+    "image": "images/coffee/yelakkai-tea.png?v=2"
+  }
+]

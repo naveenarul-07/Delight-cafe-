@@ -1,0 +1,18 @@
+[build]
+  publish = "."
+  command = "npm install"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "nft"
+  external_node_modules = ["mysql2", "express", "express-session", "better-sqlite3"]
+  included_files = ["menu/**", "db/**"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+[build.environment]
+  NODE_VERSION = "20"

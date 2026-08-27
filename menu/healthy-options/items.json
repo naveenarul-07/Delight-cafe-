@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Fruit Salad Bowl",
+    "price": 120,
+    "image": "images/salads/fruit-salad-bowl.png?v=2"
+  },
+  {
+    "name": "Garden Fresh Salad",
+    "price": 135,
+    "image": "images/starters/veg-grilled-sandwich.jpg"
+  },
+  {
+    "name": "Multigrain Sandwich",
+    "price": 140,
+    "image": "images/starters/veg-grilled-sandwich.jpg"
+  }
+]

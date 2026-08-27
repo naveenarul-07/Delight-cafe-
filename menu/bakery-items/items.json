@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Blueberry Muffin",
+    "price": 105,
+    "image": "images/starters/blueberry-muffin.jpg"
+  },
+  {
+    "name": "Chocolate Donut",
+    "price": 85,
+    "image": "images/bakery/chocolate-donut.png?v=2"
+  },
+  {
+    "name": "Butter Sponge Cake",
+    "price": 185,
+    "image": "images/starters/blueberry-muffin.jpg"
+  },
+  {
+    "name": "Cup Cake",
+    "price": 30,
+    "image": "images/bakery/cup-cake.png"
+  },
+  {
+    "name": "Pastry Cake",
+    "price": 30,
+    "image": "images/bakery/pastry-cake.png"
+  },
+  {
+    "name": "Banana Biscuits",
+    "price": 30,
+    "image": "images/bakery/banana-biscuits.png"
+  },
+  {
+    "name": "Butter Cookies",
+    "price": 30,
+    "image": "images/bakery/butter-cookies.jpg"
+  }
+]

@@ -1,1 +1,6 @@
 node_modules/
+db/*.db
+users.json
+.env
+bills/
+sms-outbox/

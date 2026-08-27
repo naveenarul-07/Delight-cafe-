@@ -11,15 +11,13 @@ const MENU_ITEMS = [
   { name: 'Cheese Sandwich', image: 'https://i.pinimg.com/736x/d4/e8/42/d4e84251889bf1dbcff1bbe53dde36c0.jpg', price: 120 },
   { name: 'Margherita Pizza', image: 'https://i.pinimg.com/736x/04/b1/96/04b1961b824f47c775e1906a61234d85.jpg', price: 199 },
   { name: 'White Sauce Pasta', image: 'https://i.pinimg.com/736x/32/55/ae/3255aef685d60f379bd148125dd95e3c.jpg', price: 185 },
-  { name: 'French Fries', image: 'https://i.pinimg.com/736x/c7/6f/e8/c76fe87e88b5750e7fd07f0be0d8a47e.jpg', price: 99 },
+  { name: 'French Fries', image: 'images/burgers/french-fries.png', price: 90 },
   { name: 'Garlic Bread', image: 'https://i.pinimg.com/736x/47/d2/90/47d29032d16d98a9ff4555af3b2433df.jpg', price: 110 },
-  { name: 'Butter Croissant', image: 'https://i.pinimg.com/736x/b9/2c/1d/b92c1d845ba8ca3001bd494939beef51.jpg', price: 90 },
   { name: 'Blueberry Muffin', image: 'https://i.pinimg.com/736x/be/70/33/be70333b60da8924416a78699c52083c.jpg', price: 95 },
   { name: 'Chocolate Donut', image: 'https://i.pinimg.com/736x/22/b6/66/22b666991bc16a67ec8c1b0d2975543c.jpg', price: 85 },
-  { name: 'Honey Pancakes', image: 'https://i.pinimg.com/736x/8d/32/37/8d323757a4f5a196d0d4796a53eb06c3.jpg', price: 150 },
-  { name: 'Belgian Waffle', image: 'https://i.pinimg.com/736x/e8/fd/fd/e8fdfdcea022da89c8f42f553596a5f8.jpg', price: 175 },
-  { name: 'Fruit Salad Bowl', image: 'https://i.pinimg.com/736x/cd/8e/fb/cd8efb27bbbd9ed81bf945044b660b57.jpg', price: 120 },
+  { name: 'Honey Pancakes', image: 'images/breakfast/honey-pancakes.png?v=2', price: 150 },
+  { name: 'Belgian Waffle', image: 'images/breakfast/belgian-waffle.jpg?v=2', price: 175 },
+  { name: 'Fruit Salad Bowl', image: 'images/salads/fruit-salad-bowl.png?v=2', price: 120 },
   { name: 'Loaded Nachos', image: 'https://i.pinimg.com/736x/9d/43/e0/9d43e08063d85ee0d4b848b23debd019.jpg', price: 160 },
-  { name: 'Veg Burger', image: 'https://i.pinimg.com/736x/dc/50/59/dc5059c3dc75e828a3fa5a34215ccd76.jpg', price: 145 },
-  { name: 'Virgin Mojito', image: 'https://i.pinimg.com/736x/b4/20/a2/b420a221391776fdc01bfb85b7f49768.jpg', price: 140 }
+  { name: 'Veg Burger', image: 'images/burgers/veg-burger.png', price: 100 }
 ];

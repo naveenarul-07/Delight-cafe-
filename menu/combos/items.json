@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Roll + French Fries + Pepsi",
+    "price": 199,
+    "image": "images/combos/roll-fries-pepsi.png"
+  },
+  {
+    "name": "Burger + French Fries + Fried Chicken + Pepsi",
+    "price": 279,
+    "image": "images/combos/burger-fries-chicken-pepsi.png"
+  },
+  {
+    "name": "Chicken Fries + French Fries",
+    "price": 199,
+    "image": "images/combos/chicken-fries-french-fries.png"
+  },
+  {
+    "name": "Pizza + Pepsi",
+    "price": 249,
+    "image": "images/combos/pizza-pepsi.jpg"
+  },
+  {
+    "name": "Pasta + Drink Combo",
+    "price": 320,
+    "image": "images/starters/white-sauce-pasta.jpg"
+  },
+  {
+    "name": "Sandwich + French Fries",
+    "price": 199,
+    "image": "images/combos/sandwich-french-fries.png"
+  }
+]

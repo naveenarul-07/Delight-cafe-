@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Paneer Tikka Wrap",
+    "price": 165,
+    "image": "images/starters/veg-grilled-sandwich.jpg"
+  },
+  {
+    "name": "Veg Mayo Roll",
+    "price": 125,
+    "image": "images/starters/cheese-sandwich.jpg"
+  }
+]

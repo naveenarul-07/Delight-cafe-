@@ -3,58 +3,88 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Castle Cafe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Delight Cafe</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=mobileview2">
 </head>
 
 <body class="home-page">
 
-    <header class="nav">
-        <div class="logo">Castle Cafe</div>
+    <header class="nav nav-glass">
+        <div class="logo">Delight Cafe</div>
         <nav>
-            <a href="index.html">Home</a>
+            <a href="index.html" class="nav-active">Home</a>
             <a href="menu.html">Menu</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
         </nav>
     </header>
 
-    <div class="login-form">
-        <h2>Login</h2>
-        <p id="loginError" class="login-error"></p>
-        <input type="text" id="username" placeholder="Username" required>
-        <div class="password-field">
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Show password">
-                <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
-                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
-                    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                </svg>
-            </button>
+    <main class="home-stage">
+        <div class="home-stage-env" aria-hidden="true">
+            <span class="home-orb home-orb-a"></span>
+            <span class="home-orb home-orb-b"></span>
+            <span class="home-orb home-orb-c"></span>
+            <span class="home-mist"></span>
+            <span class="home-spark home-spark-1"></span>
+            <span class="home-spark home-spark-2"></span>
+            <span class="home-spark home-spark-3"></span>
         </div>
-        <div class="login-links">
-            <a href="#" onclick="forgotPassword(); return false;">Forgot Password?</a>
-            <a href="register.html">Create new account</a>
-        </div>
-        <button type="button" onclick="login()">Login</button>
-    </div>
+        <div class="home-stage-inner">
+            <section class="home-brand" aria-label="Delight Cafe">
+                <p class="home-kicker">Est. for slow mornings &amp; good company</p>
+                <h1 class="home-brand-name">Delight Cafe</h1>
+                <p class="home-lead">Fresh plates, warm hospitality, and a quieter kind of luxury.</p>
+                <div class="home-cta-group">
+                    <a class="btn-hero" href="menu.html">Explore the menu</a>
+                    <a class="btn-hero-ghost" href="#loginPanel">Sign in</a>
+                </div>
+            </section>
 
-    <footer>
-        <p>&copy; 2025 Castle Cafe. All rights reserved.</p>
+            <form class="login-form home-auth-panel auth-panel-compact" id="loginPanel" onsubmit="event.preventDefault(); login();">
+                <p class="auth-eyebrow">Member access</p>
+                <h2>Sign in</h2>
+                <p class="auth-lead">Enter your registered mobile number or email.</p>
+                <p id="loginError" class="login-error" role="alert"></p>
+
+                <label class="auth-label" for="username">Mobile number or email</label>
+                <input type="text" id="username" name="identifier" required autocomplete="username" inputmode="email">
+
+                <label class="auth-label" for="password">Password</label>
+                <div class="password-field">
+                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Show password">
+                        <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="login-links">
+                    <a href="#" onclick="forgotPassword(); return false;">Forgot password?</a>
+                    <a href="register.html">Create account</a>
+                </div>
+                <button type="submit" id="loginSubmitBtn">Sign in</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Delight Cafe. Crafted for every visit.</p>
         <button id="logoutBtn" class="footer-logout" type="button" onclick="logout()" style="display:none">Logout</button>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="js/script.js?v=apicomplete2"></script>
 </body>
 
 </html>

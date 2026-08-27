@@ -3,38 +3,46 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About | Castle Cafe</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>About | Delight Cafe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=mobileview2">
 </head>
 
-<body>
+<body class="site-page about-page">
 
-
-    <header class="nav">
-        <div class="logo">Castle Cafe</div>
+    <header class="nav nav-glass">
+        <div class="logo">Delight Cafe</div>
         <nav>
             <a href="index.html">Home</a>
             <a href="menu.html">Menu</a>
-            <a href="about.html">About</a>
+            <a href="about.html" class="nav-active">About</a>
             <a href="contact.html">Contact</a>
         </nav>
     </header>
 
+    <main class="about-stage">
+        <section class="about-hero">
+            <p class="section-kicker">Our story</p>
+            <h1 class="about-brand">Delight Cafe</h1>
+            <p class="about-lead">Where tradition meets elegance — ethically sourced beans, handcrafted plates, and hospitality that feels like home.</p>
+        </section>
 
-    <div class="about-text">
-        <h2>About Us</h2>
-        <p>Castle Cafe is where tradition meets elegance. From ethically sourced beans to handcrafted pastries, we serve quality with love.</p>
-    </div>
+        <section class="about-panel">
+            <h2>Made with care</h2>
+            <p>We brew slowly, plate thoughtfully, and keep the room warm. From morning filter coffee to late desserts, every visit should feel unhurried and a little special.</p>
+            <a class="btn-hero" href="menu.html">See what’s cooking</a>
+        </section>
+    </main>
 
-
-    <footer>
-        <p>&copy; 2025 Castle Cafe. All rights reserved.</p>
+    <footer class="site-footer">
+        <p>&copy; 2026 Delight Cafe. Crafted for every visit.</p>
         <button id="logoutBtn" class="footer-logout" type="button" onclick="logout()" style="display:none">Logout</button>
     </footer>
 
-
-    <script src="script.js"></script>
+    <script src="js/script.js?v=apicomplete2"></script>
 </body>
 
 </html>

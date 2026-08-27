@@ -3,19 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Payment | Castle Cafe</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Complete Payment | Delight Cafe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=mobileview2">
 </head>
 
 <body class="payment-page">
 
     <header class="fk-header">
-        <a href="menu.html" class="fk-back">
+        <a href="checkout.html" class="fk-back">
             <span class="fk-back-arrow">&larr;</span> Complete Payment
         </a>
-        <span class="fk-secure">&#128274; 100% Secure</span>
+        <span class="fk-brand-mark">Delight Cafe</span>
+        <span class="fk-secure">Secure checkout</span>
     </header>
+
+    <section class="fk-order-details-wrap">
+        <div class="fk-order-details" id="orderDetailsSummary" hidden></div>
+    </section>
 
     <div class="fk-card">
         <aside class="fk-sidebar">
@@ -24,7 +32,7 @@
                 <span class="fk-method-icon upi-icon">UPI</span>
                 <span class="fk-method-text">
                     <strong>UPI</strong>
-                    <small>Pay by any UPI app</small>
+                    <small>Google Pay, PhonePe, Paytm, BHIM</small>
                 </span>
             </label>
 
@@ -32,9 +40,8 @@
                 <input type="radio" name="payment" value="card">
                 <span class="fk-method-icon card-icon">&#128179;</span>
                 <span class="fk-method-text">
-                    <strong>Credit / Debit / ATM Card</strong>
-                    <small>Add and secure cards as per RBI guidelines</small>
-                    <em class="fk-offer-line">Get upto 5% cashback &bull; 2 offers available</em>
+                    <strong>Credit / Debit Card</strong>
+                    <small>Pay securely with your card</small>
                 </span>
             </label>
 
@@ -43,70 +50,64 @@
                 <span class="fk-method-icon cod-icon">&#8377;</span>
                 <span class="fk-method-text">
                     <strong>Cash on Delivery</strong>
+                    <small>Pay when your order arrives</small>
                 </span>
             </label>
-
-            <div class="fk-method fk-method-static">
-                <span class="fk-method-icon gift-icon">&#127873;</span>
-                <span class="fk-method-text">
-                    <strong>Have a Gift Card?</strong>
-                </span>
-            </div>
         </aside>
 
         <section class="fk-content">
             <div class="fk-panel" id="upiPanel">
-                <h2 class="fk-panel-title">Scan QR and Pay</h2>
+                <h2 class="fk-panel-title">Pay with UPI</h2>
                 <div class="fk-scanner-amount">
-                    <p class="fk-qr-amount-label">Amount to Pay</p>
+                    <p class="fk-qr-amount-label">Amount to pay</p>
                     <p class="fk-qr-amount-value" id="upiAmountDisplay">₹0</p>
                 </div>
                 <div class="fk-upi-scanner-wrap">
                     <img src="images/upi-scanner.png?v=7" class="fk-upi-scanner-img" id="upiQrCode" alt="UPI QR Scanner">
                 </div>
                 <div class="fk-upi-apps-row" id="upiAppsRow">
-                    <button type="button" class="fk-upi-circle" onclick="selectUpiApp('Google Pay')" title="Google Pay">
+                    <button type="button" class="fk-upi-circle" data-upi-app="Google Pay" title="Google Pay">
                         <span class="fk-upi-circle-icon gpay-bg"><img src="images/gpay.svg" alt="Google Pay"></span>
                         <span class="fk-upi-circle-label">Google Pay</span>
                     </button>
-                    <button type="button" class="fk-upi-circle" onclick="selectUpiApp('PhonePe')" title="PhonePe">
+                    <button type="button" class="fk-upi-circle" data-upi-app="PhonePe" title="PhonePe">
                         <span class="fk-upi-circle-icon phonepe-bg"><img src="images/phonepe.svg" alt="PhonePe"></span>
                         <span class="fk-upi-circle-label">PhonePe</span>
                     </button>
-                    <button type="button" class="fk-upi-circle" onclick="selectUpiApp('Paytm')" title="Paytm">
+                    <button type="button" class="fk-upi-circle" data-upi-app="Paytm" title="Paytm">
                         <span class="fk-upi-circle-icon paytm-bg"><img src="images/paytm.svg" alt="Paytm"></span>
                         <span class="fk-upi-circle-label">Paytm</span>
                     </button>
-                    <button type="button" class="fk-upi-circle" onclick="selectUpiApp('BHIM')" title="BHIM">
-                        <span class="fk-upi-circle-icon bhim-bg"><img src="images/bhim.svg" alt="BHIM"></span>
+                    <button type="button" class="fk-upi-circle" data-upi-app="BHIM" title="BHIM">
+                        <span class="fk-upi-circle-icon bhim-bg"><img src="images/bhim.svg?v=npci" alt="BHIM"></span>
                         <span class="fk-upi-circle-label">BHIM</span>
                     </button>
                 </div>
-                <p class="fk-upi-or">or any other UPI app</p>
-                <p class="fk-warning">Do not hit back or close this screen until the transaction is complete</p>
-                <button type="button" class="fk-pay-btn fk-pay-btn-upi" onclick="confirmUpiPayment()" disabled>Pay</button>
+                <p class="fk-upi-or">Select an app, then tap Pay</p>
+                <p class="fk-warning">Stay on this screen until payment finishes</p>
+                <button type="button" class="fk-pay-btn fk-pay-btn-upi" id="upiPayBtn" disabled>Select UPI app</button>
             </div>
 
             <div class="fk-panel hidden" id="cardPanel">
-                <h2 class="fk-panel-title">Add New Card</h2>
+                <h2 class="fk-panel-title">Card payment</h2>
                 <div class="fk-card-form">
-                    <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19">
-                    <input type="text" id="cardName" placeholder="Name on Card">
+                    <input type="text" id="cardNumber" placeholder="Card number" maxlength="19" autocomplete="cc-number">
+                    <input type="text" id="cardName" placeholder="Name on card" autocomplete="cc-name">
                     <div class="card-row">
-                        <input type="text" id="cardExpiry" placeholder="Valid Thru (MM/YY)" maxlength="5">
-                        <input type="text" id="cardCvv" placeholder="CVV" maxlength="4">
+                        <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp">
+                        <input type="password" id="cardCvv" placeholder="CVV" maxlength="4" autocomplete="cc-csc">
                     </div>
                 </div>
-                <button type="button" class="fk-pay-btn" onclick="processPayment()">Pay</button>
+                <button type="button" class="fk-pay-btn" id="cardPayBtn">Pay now</button>
             </div>
 
             <div class="fk-panel hidden" id="codPanel">
-                <h2 class="fk-panel-title">Cash on Delivery</h2>
+                <h2 class="fk-panel-title">Cash on delivery</h2>
                 <div class="fk-cod-box">
-                    <p>You can pay in cash when your order is delivered at your doorstep.</p>
+                    <p>Pay in cash when your order is delivered.</p>
                     <p class="fk-cod-amount">Amount to pay: <strong id="codAmountDisplay">₹0</strong></p>
                 </div>
-                <button type="button" class="fk-pay-btn" onclick="processPayment()">Place Order</button>
+                <button type="button" class="fk-pay-btn" id="codPayBtn">Place order</button>
             </div>
 
             <p id="paymentMessage" class="payment-message"></p>
@@ -114,40 +115,18 @@
 
         <aside class="fk-price">
             <div class="fk-price-box">
+                <h3 class="fk-price-heading">Order summary</h3>
+                <ul id="summaryList" class="fk-price-items"></ul>
                 <div class="fk-price-row">
-                    <span>Subtotal <small>(items)</small></span>
+                    <span>Items total</span>
                     <span id="priceSubtotal">₹0</span>
                 </div>
-
-                <div class="fk-price-row fk-price-sub">
-                    <span>Platform Fee</span>
-                    <span id="priceFee">₹5</span>
-                </div>
-
-                <div class="fk-price-row fk-price-sub discount" id="couponRow">
-                    <span>Coupon Discount</span>
-                    <span id="priceCoupon">-₹0</span>
-                </div>
-
                 <div class="fk-price-total">
-                    <span>Total Amount</span>
+                    <span>Total</span>
                     <span id="summaryTotal">₹0</span>
                 </div>
+                <p class="fk-no-fee-note">No platform fee · Pay only for what you order</p>
             </div>
-
-            <div class="fk-offer-box">
-                <div class="fk-offer-text">
-                    <strong>5% Cashback</strong>
-                    <p>Claim now with payment offers</p>
-                </div>
-                <div class="fk-offer-logos">
-                    <span class="fk-mini-logo gpay">G</span>
-                    <span class="fk-mini-logo phonepe">Pe</span>
-                    <span class="fk-mini-logo paytm">Pt</span>
-                </div>
-            </div>
-
-            <ul id="summaryList" class="fk-price-items hidden"></ul>
         </aside>
     </div>
 
@@ -164,13 +143,13 @@
             <p id="payOverlayMessage">Please wait...</p>
             <p class="pay-overlay-amount hidden" id="payOverlayAmount"></p>
             <div class="pay-overlay-actions">
-                <button type="button" class="pay-retry-btn hidden" id="payRetryBtn" onclick="retryUpiPayment()">Try Again</button>
-                <button type="button" class="pay-cancel-btn hidden" id="payCancelBtn" onclick="cancelUpiPayment()">Cancel</button>
+                <button type="button" class="pay-retry-btn hidden" id="payRetryBtn">Try again</button>
+                <button type="button" class="pay-cancel-btn hidden" id="payCancelBtn">Cancel</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/script.js?v=apicomplete2"></script>
 </body>
 
 </html>

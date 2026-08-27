@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Hot Chocolate",
+    "price": 130,
+    "image": "images/beverages/hot-chocolate.jpg"
+  },
+  {
+    "name": "Horlicks Hot",
+    "price": 85,
+    "image": "images/beverages/hot-chocolate.jpg"
+  },
+  {
+    "name": "Badam Milk (Hot)",
+    "price": 110,
+    "image": "images/beverages/badam-milk.jpg?v=2"
+  },
+  {
+    "name": "Madras Masala Chai",
+    "price": 40,
+    "image": "images/coffee/masala-chai.jpg?v=2"
+  }
+]

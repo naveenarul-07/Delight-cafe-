@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Oreo Milkshake",
+    "price": 150,
+    "image": "images/milkshakes/oreo-milkshake.png"
+  },
+  {
+    "name": "KitKat Milkshake",
+    "price": 150,
+    "image": "images/milkshakes/kitkat-milkshake.png"
+  },
+  {
+    "name": "Banana Milkshake",
+    "price": 145,
+    "image": "images/milkshakes/banana-milkshake.jpg"
+  },
+  {
+    "name": "Mango Milkshake",
+    "price": 145,
+    "image": "images/milkshakes/mango-milkshake.png"
+  },
+  {
+    "name": "Blueberry Milkshake",
+    "price": 145,
+    "image": "images/milkshakes/blueberry-milkshake.png"
+  },
+  {
+    "name": "Chocolate Milkshake",
+    "price": 145,
+    "image": "images/milkshakes/chocolate-milkshake.png?v=2"
+  },
+  {
+    "name": "Strawberry Milkshake",
+    "price": 145,
+    "image": "images/milkshakes/strawberry-milkshake.jpg"
+  },
+  {
+    "name": "Vanilla Milkshake",
+    "price": 135,
+    "image": "images/milkshakes/vanilla-milkshake.jpg"
+  },
+  {
+    "name": "Cold Coffee Frappe",
+    "price": 155,
+    "image": "images/milkshakes/cold-coffee.jpg"
+  },
+  {
+    "name": "Mango Smoothie",
+    "price": 165,
+    "image": "images/milkshakes/strawberry-milkshake.jpg"
+  },
+  {
+    "name": "Madras Cold Coffee",
+    "price": 120,
+    "image": "images/milkshakes/cold-coffee.jpg"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Special Brownie",
+    "price": 210,
+    "image": "images/starters/sizzling-brownie.jpg"
+  },
+  {
+    "name": "Chef Signature Pasta",
+    "price": 299,
+    "image": "images/starters/white-sauce-pasta.jpg"
+  },
+  {
+    "name": "Royal Filter Kaapi",
+    "price": 75,
+    "image": "images/coffee/filter-kaapi.jpg"
+  }
+]

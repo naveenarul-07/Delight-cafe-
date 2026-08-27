@@ -1,13 +1,23 @@
 {
-  "name": "castle-cafe",
+  "name": "Delight-Cafe",
   "version": "1.0.0",
-  "description": "Castle Cafe website with login and cart",
+  "description": "Delight Cafe website with Express backend and React frontend",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "dev:react": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "build:react": "npm --prefix client run build"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
     "express": "^4.21.2",
-    "express-session": "^1.18.1"
+    "express-session": "^1.18.1",
+    "mysql2": "^3.24.2",
+    "serverless-http": "^3.2.0"
   }
 }
