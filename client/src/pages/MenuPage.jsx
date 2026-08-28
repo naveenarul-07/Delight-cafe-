@@ -61,12 +61,12 @@ export default function MenuPage() {
         </button>
         {categories.map((cat) => (
           <button
-            key={cat}
+            key={cat.slug}
             type="button"
-            className={active === cat ? 'chip on' : 'chip'}
-            onClick={() => setActive(cat)}
+            className={active === cat.slug ? 'chip on' : 'chip'}
+            onClick={() => setActive(cat.slug)}
           >
-            {cat}
+            {cat.label}
           </button>
         ))}
       </div>
