@@ -2067,6 +2067,7 @@ async function initApp() {
 
   const isRegisterPage = document.getElementById('regPassword') && (document.getElementById('regPhone') || document.getElementById('regEmail') || document.getElementById('regUsername'));
   const isLoginPage = document.getElementById('username') && document.getElementById('password') && document.getElementById('loginPanel');
+  const loginForm = document.getElementById('loginPanel');
 
   if (loginForm && (isLoginPage || isRegisterPage)) {
     loginForm.addEventListener('keydown', (e) => {
