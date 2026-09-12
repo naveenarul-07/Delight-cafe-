@@ -2,5 +2,6 @@ node_modules/
 db/*.db
 users.json
 .env
+*.log
 bills/
 sms-outbox/
