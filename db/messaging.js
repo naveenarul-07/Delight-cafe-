@@ -123,7 +123,7 @@ function buildWhatsAppUrl(phoneInput, message) {
 }
 
 function appendOutbox(phone, message, meta = {}) {
-  // History is stored in SQLite (customer_messages / orders) — do not write local system files.
+  // History is stored in MongoDB (customer_messages / orders) — do not write local system files.
   return null;
 }
 

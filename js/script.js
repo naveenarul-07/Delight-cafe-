@@ -62,7 +62,7 @@ function apiOfflineMessage(status) {
       return 'API not found. Redeploy on Netlify with Functions enabled (Clear cache and deploy).';
     }
     if (status === 500 || status === 502 || status === 504) {
-      return 'API error. Check Netlify Function logs. Login works with built-in SQLite; optional MySQL env improves persistence.';
+      return 'API error. Check Netlify Function logs and confirm MONGODB_URI is configured.';
     }
     return 'Cannot reach API on Netlify. Confirm /api/* redirects to Functions, then redeploy.';
   }
@@ -788,7 +788,7 @@ async function loadMenuItems() {
   const online = await checkServerHealth();
   if (!online) {
     container.innerHTML = isNetlifyHost()
-      ? '<p class="empty-msg">API offline on Netlify. Set MySQL env vars and redeploy Functions.</p>'
+      ? '<p class="empty-msg">API offline on Netlify. Set MONGODB_URI and redeploy Functions.</p>'
       : '<p class="empty-msg">Server offline. Run <strong>npm start</strong> and open <strong>http://localhost:8080</strong> (not Live Server).</p>';
     return;
   }

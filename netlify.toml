@@ -5,7 +5,7 @@
 
 [functions]
   node_bundler = "nft"
-  external_node_modules = ["mysql2", "express", "express-session", "better-sqlite3"]
+  external_node_modules = ["mongodb", "express", "express-session"]
   included_files = ["menu/**", "db/**"]
 
 [[redirects]]

@@ -22,7 +22,7 @@ try {
   console.warn('Could not load .env:', err.message);
 }
 
-const db = require('./db/database');
+const db = require('./db/mongo');
 const { getMenuCategories } = require('./db/load-menu');
 const {
   sendNormalTextMessage,
@@ -79,7 +79,7 @@ function toClientUser(user) {
 }
 
 async function flushPendingCustomerMessages() {
-  const pending = db.getPendingCustomerMessages();
+  const pending = await db.getPendingCustomerMessages();
   let attempted = 0;
   let sent = 0;
   const links = [];
@@ -94,10 +94,10 @@ async function flushPendingCustomerMessages() {
     attempted += 1;
     const delivery = await sendNormalTextMessage(entry.phone, entry.message);
     if (delivery.delivered && delivery.whatsappUrl) {
-      db.markCustomerMessageSent(entry.id, 'whatsapp');
-      pending
-        .filter((p) => p.phone === entry.phone && p.message === entry.message)
-        .forEach((p) => db.markCustomerMessageSent(p.id, 'whatsapp'));
+      await db.markCustomerMessageSent(entry.id, 'whatsapp');
+      for (const matching of pending.filter((p) => p.phone === entry.phone && p.message === entry.message)) {
+        await db.markCustomerMessageSent(matching.id, 'whatsapp');
+      }
       sent += 1;
       links.push({ phone: delivery.phone, whatsappUrl: delivery.whatsappUrl });
     }
@@ -144,7 +144,7 @@ async function sendOrderConfirmationMessage(order, req = null) {
     };
   }
 
-  const withToken = db.ensureInvoiceToken(order.id) || order;
+  const withToken = (await db.ensureInvoiceToken(order.id)) || order;
   const bill = buildBill(withToken);
   const caption = buildWhatsAppBillCaption(withToken);
   const customerName = withToken.orderDetails?.fullName || withToken.username || 'Customer';
@@ -158,7 +158,7 @@ async function sendOrderConfirmationMessage(order, req = null) {
     const links = buildWhatsAppUrl(phone, caption);
     if (!firstLinks.whatsappUrl) firstLinks = links;
 
-    const saved = db.createCustomerMessage({
+    const saved = await db.createCustomerMessage({
       orderId: withToken.id,
       phone: delivery.phone || phone,
       message: caption,
@@ -176,8 +176,8 @@ async function sendOrderConfirmationMessage(order, req = null) {
   }
 
   try {
-    db.setAppMeta('sms_last_error', '');
-    db.setAppMeta('sms_provider', 'whatsapp');
+    await db.setAppMeta('sms_last_error', '');
+    await db.setAppMeta('sms_provider', 'whatsapp');
   } catch (_) {
     /* ignore */
   }
@@ -223,7 +223,7 @@ async function completeOrder(req, paymentMeta = {}) {
   const totals = calculateOrderTotal(cart);
   const paymentMethod = paymentMeta.paymentMethod || 'card';
 
-  const order = db.createOrder({
+  const order = await db.createOrder({
     userId: req.session.user.id,
     username: req.session.user.username,
     items: [...cart],
@@ -244,7 +244,7 @@ async function completeOrder(req, paymentMeta = {}) {
   req.session.lastOrder = { id: order.id, total: order.total, status: order.status };
   delete req.session.pendingUpiPayment;
   delete req.session.orderDetails;
-  db.clearUserCart(req.session.user.id);
+  await db.clearUserCart(req.session.user.id);
 
   return { order, notification };
 }
@@ -341,58 +341,34 @@ app.set('trust proxy', 1);
 const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.env.RENDER);
 const SESSION_MAX_AGE = 24 * 60 * 60 * 1000;
 
-class SqliteSessionStore extends session.Store {
+class MongoSessionStore extends session.Store {
   constructor() {
     super();
-    try {
-      db.cleanupExpiredSessions();
-    } catch (_) {
-      /* table may init later */
-    }
+    db.initMongo().then(() => db.cleanupExpiredSessions()).catch(() => {});
   }
 
   get(sid, callback) {
-    try {
-      const data = db.getSession(sid);
-      callback(null, data || null);
-    } catch (err) {
-      callback(err);
-    }
+    db.initMongo().then(() => db.getSession(sid)).then((data) => callback(null, data || null)).catch(callback);
   }
 
   set(sid, sess, callback) {
-    try {
-      const maxAge = sess?.cookie?.maxAge || SESSION_MAX_AGE;
-      db.setSession(sid, sess, maxAge);
-      callback(null);
-    } catch (err) {
-      callback(err);
-    }
+    const maxAge = sess?.cookie?.maxAge || SESSION_MAX_AGE;
+    db.initMongo().then(() => db.setSession(sid, sess, maxAge)).then(() => callback(null)).catch(callback);
   }
 
   destroy(sid, callback) {
-    try {
-      db.destroySession(sid);
-      callback(null);
-    } catch (err) {
-      callback(err);
-    }
+    db.initMongo().then(() => db.destroySession(sid)).then(() => callback(null)).catch(callback);
   }
 
   touch(sid, sess, callback) {
-    try {
-      const maxAge = sess?.cookie?.maxAge || SESSION_MAX_AGE;
-      db.touchSession(sid, maxAge);
-      callback(null);
-    } catch (err) {
-      callback(err);
-    }
+    const maxAge = sess?.cookie?.maxAge || SESSION_MAX_AGE;
+    db.initMongo().then(() => db.touchSession(sid, maxAge)).then(() => callback(null)).catch(callback);
   }
 }
 
-function hydrateUserState(req) {
+async function hydrateUserState(req) {
   if (!req.session.user?.id) return;
-  const saved = db.getUserCart(req.session.user.id);
+  const saved = await db.getUserCart(req.session.user.id);
   if (!Array.isArray(req.session.cart) || req.session.cart.length === 0) {
     req.session.cart = saved.cart || [];
   }
@@ -401,14 +377,14 @@ function hydrateUserState(req) {
   }
 }
 
-function persistUserState(req) {
+async function persistUserState(req) {
   if (!req.session.user?.id) return;
-  db.saveUserCart(req.session.user.id, req.session.cart || [], req.session.orderDetails || null);
+  await db.saveUserCart(req.session.user.id, req.session.cart || [], req.session.orderDetails || null);
 }
 
 app.use(
   session({
-    store: new SqliteSessionStore(),
+    store: new MongoSessionStore(),
     secret: process.env.SESSION_SECRET || 'Delight-Cafe-secret-key',
     resave: false,
     saveUninitialized: false,
@@ -448,8 +424,13 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-app.get('/api/health', (req, res) => {
-  res.json({ success: true, status: 'ok', time: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+  try {
+    await db.initMongo();
+    res.json({ success: true, status: 'ok', time: new Date().toISOString(), db: 'mongodb', env: db.describeMongoEnv() });
+  } catch (error) {
+    res.status(500).json({ success: false, status: 'db-error', time: new Date().toISOString(), message: db.formatMongoError(error), env: db.describeMongoEnv() });
+  }
 });
 
 app.get('/api/config', (req, res) => {
@@ -460,8 +441,8 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-app.get('/api/menu', (req, res) => {
-  const items = db.getMenuItems();
+app.get('/api/menu', async (req, res) => {
+  const items = await db.getMenuItems();
   const category = String(req.query.category || '').trim();
 
   if (category) {
@@ -472,12 +453,12 @@ app.get('/api/menu', (req, res) => {
   res.json({ success: true, items });
 });
 
-app.get('/api/menu/categories', (req, res) => {
-  const items = db.getMenuItems();
+app.get('/api/menu/categories', async (req, res) => {
+  const items = await db.getMenuItems();
   res.json({ success: true, categories: getMenuCategories(items) });
 });
 
-app.post('/api/contact', (req, res) => {
+app.post('/api/contact', async (req, res) => {
   const name = String(req.body.name || '').trim();
   const email = String(req.body.email || '').trim();
   const message = String(req.body.message || '').trim();
@@ -494,11 +475,11 @@ app.post('/api/contact', (req, res) => {
     return res.status(400).json({ success: false, message: 'Message must be at least 10 characters' });
   }
 
-  const saved = db.createContactMessage({ name, email, message });
+  const saved = await db.createContactMessage({ name, email, message });
   res.json({ success: true, message: 'Thank you! We will get back to you soon.', id: saved.id });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const identifier = String(req.body.identifier || req.body.username || req.body.email || req.body.phone || '').trim();
   const password = String(req.body.password || '').trim();
 
@@ -517,7 +498,7 @@ app.post('/api/login', (req, res) => {
     return res.status(400).json({ success: false, message: 'Please enter a valid 10-digit mobile number' });
   }
 
-  const user = db.findUserByCredentials(identifier, password);
+  const user = await db.findUserByCredentials(identifier, password);
   if (!user) {
     return res.status(401).json({
       success: false,
@@ -525,15 +506,15 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  const loginRecord = db.recordUserLogin(user, {
+  const loginRecord = await db.recordUserLogin(user, {
     identifier,
     ip: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '',
     userAgent: req.headers['user-agent'] || ''
   });
 
   req.session.user = toClientUser(user);
-  hydrateUserState(req);
-  persistUserState(req);
+  await hydrateUserState(req);
+  await persistUserState(req);
   res.json({
     success: true,
     user: req.session.user,
@@ -542,7 +523,7 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const password = String(req.body.password || '').trim();
   const confirmPassword = String(req.body.confirmPassword || req.body.passwordConfirm || '').trim();
   const emailRaw = String(req.body.email || '').trim();
@@ -573,13 +554,13 @@ app.post('/api/register', (req, res) => {
     return res.status(400).json({ success: false, message: 'Passwords do not match' });
   }
 
-  if (email && db.findUserByEmail(email)) {
+  if (email && (await db.findUserByEmail(email))) {
     return res.status(409).json({
       success: false,
       message: 'An account with this email already exists. Please sign in or use a different email.'
     });
   }
-  if (phone && db.findUserByPhone(phone)) {
+  if (phone && (await db.findUserByPhone(phone))) {
     return res.status(409).json({
       success: false,
       message: 'An account with this mobile number already exists. Please sign in or use a different number.'
@@ -588,7 +569,7 @@ app.post('/api/register', (req, res) => {
 
   // Prefer email as username when present; otherwise use phone
   let username = email || phone;
-  if (db.findUserByUsername(username)) {
+  if (await db.findUserByUsername(username)) {
     return res.status(409).json({
       success: false,
       message: 'An account with these details already exists. Please sign in instead.'
@@ -596,14 +577,14 @@ app.post('/api/register', (req, res) => {
   }
 
   try {
-    const newUser = db.createUser(username, password, {
+    const newUser = await db.createUser(username, password, {
       email: email || null,
       phone: phone || null
     });
     req.session.user = toClientUser(newUser);
     req.session.cart = [];
-    db.saveUserCart(newUser.id, [], null);
-    db.recordUserLogin(newUser, {
+    await db.saveUserCart(newUser.id, [], null);
+    await db.recordUserLogin(newUser, {
       identifier: username,
       ip: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '',
       userAgent: req.headers['user-agent'] || ''
@@ -625,16 +606,16 @@ app.post('/api/register', (req, res) => {
   }
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', async (req, res) => {
   if (req.session.user?.id) {
-    persistUserState(req);
+    await persistUserState(req);
   }
   req.session.destroy(() => res.json({ success: true }));
 });
 
-app.get('/api/auth/check', (req, res) => {
+app.get('/api/auth/check', async (req, res) => {
   if (req.session.user) {
-    hydrateUserState(req);
+    await hydrateUserState(req);
   }
   const cart = req.session.cart || [];
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -646,20 +627,20 @@ app.get('/api/auth/check', (req, res) => {
   }
 });
 
-app.get('/api/cart', requireAuth, (req, res) => {
-  hydrateUserState(req);
+app.get('/api/cart', requireAuth, async (req, res) => {
+  await hydrateUserState(req);
   res.json({ success: true, cart: req.session.cart || [] });
 });
 
-app.post('/api/cart/add', requireAuth, (req, res) => {
+app.post('/api/cart/add', requireAuth, async (req, res) => {
   const { name, quantity } = req.body;
-  const menuItem = db.getMenuItemByName(name);
+  const menuItem = await db.getMenuItemByName(name);
 
   if (!menuItem || !quantity) {
     return res.status(400).json({ success: false, message: 'Invalid item or quantity' });
   }
 
-  hydrateUserState(req);
+  await hydrateUserState(req);
   req.session.cart = req.session.cart || [];
   const existing = req.session.cart.find((item) => item.name === name);
 
@@ -674,11 +655,11 @@ app.post('/api/cart/add', requireAuth, (req, res) => {
     });
   }
 
-  persistUserState(req);
+  await persistUserState(req);
   res.json({ success: true, cart: req.session.cart });
 });
 
-app.patch('/api/cart/update', requireAuth, (req, res) => {
+app.patch('/api/cart/update', requireAuth, async (req, res) => {
   const name = String(req.body.name || '').trim();
   const quantity = Number(req.body.quantity);
 
@@ -686,7 +667,7 @@ app.patch('/api/cart/update', requireAuth, (req, res) => {
     return res.status(400).json({ success: false, message: 'Invalid item or quantity' });
   }
 
-  hydrateUserState(req);
+  await hydrateUserState(req);
   req.session.cart = req.session.cart || [];
   const item = req.session.cart.find((entry) => entry.name === name);
 
@@ -695,20 +676,20 @@ app.patch('/api/cart/update', requireAuth, (req, res) => {
   }
 
   item.quantity = Math.min(100, Math.floor(quantity));
-  persistUserState(req);
+  await persistUserState(req);
   res.json({ success: true, cart: req.session.cart });
 });
 
-app.delete('/api/cart/item/:name', requireAuth, (req, res) => {
+app.delete('/api/cart/item/:name', requireAuth, async (req, res) => {
   const name = decodeURIComponent(req.params.name);
-  hydrateUserState(req);
+  await hydrateUserState(req);
   req.session.cart = (req.session.cart || []).filter((entry) => entry.name !== name);
-  persistUserState(req);
+  await persistUserState(req);
   res.json({ success: true, cart: req.session.cart });
 });
 
-app.get('/api/cart/summary', requireAuth, (req, res) => {
-  hydrateUserState(req);
+app.get('/api/cart/summary', requireAuth, async (req, res) => {
+  await hydrateUserState(req);
   const cart = req.session.cart || [];
   const totals = calculateOrderTotal(cart);
   res.json({
@@ -719,13 +700,13 @@ app.get('/api/cart/summary', requireAuth, (req, res) => {
   });
 });
 
-app.get('/api/order-details', requireAuth, (req, res) => {
-  hydrateUserState(req);
+app.get('/api/order-details', requireAuth, async (req, res) => {
+  await hydrateUserState(req);
   res.json({ success: true, orderDetails: req.session.orderDetails || null });
 });
 
-app.post('/api/order-details', requireAuth, (req, res) => {
-  hydrateUserState(req);
+app.post('/api/order-details', requireAuth, async (req, res) => {
+  await hydrateUserState(req);
   const cart = req.session.cart || [];
   if (!cart.length) {
     return res.status(400).json({ success: false, message: 'Your cart is empty' });
@@ -737,30 +718,30 @@ app.post('/api/order-details', requireAuth, (req, res) => {
   }
 
   req.session.orderDetails = result.details;
-  persistUserState(req);
+  await persistUserState(req);
   res.json({ success: true, orderDetails: req.session.orderDetails });
 });
 
-app.delete('/api/order-details', requireAuth, (req, res) => {
+app.delete('/api/order-details', requireAuth, async (req, res) => {
   delete req.session.orderDetails;
   if (req.session.user?.id) {
-    db.saveUserCart(req.session.user.id, req.session.cart || [], null);
+    await db.saveUserCart(req.session.user.id, req.session.cart || [], null);
   }
   res.json({ success: true });
 });
 
-app.delete('/api/cart/clear', requireAuth, (req, res) => {
+app.delete('/api/cart/clear', requireAuth, async (req, res) => {
   req.session.cart = [];
   delete req.session.orderDetails;
   if (req.session.user?.id) {
-    db.clearUserCart(req.session.user.id);
+    await db.clearUserCart(req.session.user.id);
   }
   res.json({ success: true, cart: [] });
 });
 
-app.get('/api/orders', requireAuth, (req, res) => {
+app.get('/api/orders', requireAuth, async (req, res) => {
   const status = String(req.query.status || 'all').toLowerCase();
-  const orders = db.getOrdersByUserId(req.session.user.id, { status });
+  const orders = await db.getOrdersByUserId(req.session.user.id, { status });
   res.json({
     success: true,
     source: 'database',
@@ -769,8 +750,8 @@ app.get('/api/orders', requireAuth, (req, res) => {
   });
 });
 
-app.get('/api/orders/:id', requireAuth, (req, res) => {
-  const order = db.getOrderById(req.params.id);
+app.get('/api/orders/:id', requireAuth, async (req, res) => {
+  const order = await db.getOrderById(req.params.id);
   if (!order) {
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
@@ -784,13 +765,13 @@ app.get('/api/orders/:id', requireAuth, (req, res) => {
   res.json({ success: true, order });
 });
 
-app.get('/api/admin/stats', requireAdmin, (req, res) => {
-  res.json({ success: true, stats: db.getAdminStats() });
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  res.json({ success: true, stats: await db.getAdminStats() });
 });
 
-app.get('/api/admin/orders', requireAdmin, (req, res) => {
+app.get('/api/admin/orders', requireAdmin, async (req, res) => {
   const scope = String(req.query.scope || 'active').toLowerCase();
-  const orders = scope === 'all' ? db.getAllOrders() : db.getActiveOrders();
+  const orders = scope === 'all' ? await db.getAllOrders() : await db.getActiveOrders();
   res.json({
     success: true,
     scope: scope === 'all' ? 'all' : 'active',
@@ -799,8 +780,8 @@ app.get('/api/admin/orders', requireAdmin, (req, res) => {
   });
 });
 
-app.get('/api/admin/orders/archive', requireAdmin, (req, res) => {
-  const archive = db.getOrdersArchiveByDate();
+app.get('/api/admin/orders/archive', requireAdmin, async (req, res) => {
+  const archive = await db.getOrdersArchiveByDate();
   res.json({
     success: true,
     message: 'Orders older than 24 hours are stored date-wise in the backend archive.',
@@ -808,17 +789,17 @@ app.get('/api/admin/orders/archive', requireAdmin, (req, res) => {
   });
 });
 
-app.get('/api/admin/users', requireAdmin, (req, res) => {
-  res.json({ success: true, users: db.getAllUsers() });
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  res.json({ success: true, users: await db.getAllUsers() });
 });
 
-app.get('/api/admin/contact', requireAdmin, (req, res) => {
-  res.json({ success: true, messages: db.getAllContactMessages() });
+app.get('/api/admin/contact', requireAdmin, async (req, res) => {
+  res.json({ success: true, messages: await db.getAllContactMessages() });
 });
 
-app.get('/api/admin/customer-details', requireAdmin, (req, res) => {
+app.get('/api/admin/customer-details', requireAdmin, async (req, res) => {
   const scope = String(req.query.scope || 'active').toLowerCase();
-  const details = db.getCustomerDetailsForAdmin({
+  const details = await db.getCustomerDetailsForAdmin({
     activeOnly: scope !== 'all'
   });
   res.json({
@@ -829,8 +810,8 @@ app.get('/api/admin/customer-details', requireAdmin, (req, res) => {
   });
 });
 
-app.get('/api/admin/messages', requireAdmin, (req, res) => {
-  const grouped = db.getCustomerMessagesByCategory(req.query.q || '');
+app.get('/api/admin/messages', requireAdmin, async (req, res) => {
+  const grouped = await db.getCustomerMessagesByCategory(req.query.q || '');
   res.json({
     success: true,
     messages: grouped.all,
@@ -841,21 +822,21 @@ app.get('/api/admin/messages', requireAdmin, (req, res) => {
   });
 });
 
-app.post('/api/admin/messages/:id/mark-sent', requireAdmin, (req, res) => {
+app.post('/api/admin/messages/:id/mark-sent', requireAdmin, async (req, res) => {
   const channel = String(req.body.channel || 'whatsapp').trim();
   const sendMethod = String(req.body.sendMethod || req.body.method || 'whatsapp').trim();
-  const entry = db.markCustomerMessageSent(req.params.id, { channel, sendMethod });
+  const entry = await db.markCustomerMessageSent(req.params.id, { channel, sendMethod });
   if (!entry) {
     return res.status(404).json({ success: false, message: 'Message not found' });
   }
   res.json({ success: true, message: 'Bill delivery stored in backend', entry });
 });
 
-app.post('/api/admin/messages/:id/mark-failed', requireAdmin, (req, res) => {
+app.post('/api/admin/messages/:id/mark-failed', requireAdmin, async (req, res) => {
   const channel = String(req.body.channel || 'whatsapp').trim();
   const lastError = String(req.body.lastError || req.body.error || 'Send failed').trim();
   const sendMethod = String(req.body.sendMethod || req.body.method || '').trim() || null;
-  const entry = db.markCustomerMessageFailed(req.params.id, { channel, lastError, sendMethod });
+  const entry = await db.markCustomerMessageFailed(req.params.id, { channel, lastError, sendMethod });
   if (!entry) {
     return res.status(404).json({ success: false, message: 'Message not found' });
   }
@@ -875,8 +856,8 @@ app.get('/api/admin/sms-settings', requireAdmin, (req, res) => {
   });
 });
 
-app.post('/api/admin/sms-settings', requireAdmin, (req, res) => {
-  db.saveSmsSettings({ provider: 'whatsapp' });
+app.post('/api/admin/sms-settings', requireAdmin, async (req, res) => {
+  await db.saveSmsSettings({ provider: 'whatsapp' });
   res.json({
     success: true,
     message: 'WhatsApp bill delivery is enabled. No SMS gateway needed.',
@@ -900,7 +881,7 @@ app.post('/api/admin/sms-test', requireAdmin, async (req, res) => {
     `*Delight Cafe — Test Bill*\nHi! This is a test WhatsApp bill to +91${phone}.\nThank you!`;
 
   const delivery = await sendNormalTextMessage(phone, text);
-  const saved = db.createCustomerMessage({
+  const saved = await db.createCustomerMessage({
     orderId: null,
     phone: delivery.phone || phone,
     message: text,
@@ -935,7 +916,7 @@ app.post('/api/admin/messages/flush', requireAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/orders/:id/send-message', requireAdmin, async (req, res) => {
-  const order = db.getOrderById(req.params.id);
+  const order = await db.getOrderById(req.params.id);
   if (!order) {
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
@@ -959,7 +940,7 @@ app.post('/api/admin/orders/:id/send-message', requireAdmin, async (req, res) =>
 
 /** Accept client-generated bill PNG and send it as a WhatsApp image to all bill phones */
 app.post('/api/admin/orders/:id/send-bill-image', requireAdmin, async (req, res) => {
-  const order = db.getOrderById(req.params.id);
+  const order = await db.getOrderById(req.params.id);
   if (!order) {
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
@@ -1000,7 +981,7 @@ app.post('/api/admin/orders/:id/send-bill-image', requireAdmin, async (req, res)
     return res.status(400).json({ success: false, message: 'Empty bill PNG data' });
   }
 
-  const withToken = db.ensureInvoiceToken(order.id) || order;
+  const withToken = (await db.ensureInvoiceToken(order.id)) || order;
   const caption = buildWhatsAppBillCaption(withToken);
   const customerName = withToken.orderDetails?.fullName || withToken.username || 'Customer';
   const bill = buildBill(withToken);
@@ -1014,7 +995,7 @@ app.post('/api/admin/orders/:id/send-bill-image', requireAdmin, async (req, res)
     const links = buildWhatsAppUrl(phone, caption);
     if (apiResult.sent) anyApiSent = true;
 
-    const saved = db.createCustomerMessage({
+    const saved = await db.createCustomerMessage({
       orderId: withToken.id,
       phone,
       message: caption,
@@ -1030,10 +1011,10 @@ app.post('/api/admin/orders/:id/send-bill-image', requireAdmin, async (req, res)
     let messageRecord = saved;
     if (apiResult.sent && saved?.id) {
       messageRecord =
-        db.markCustomerMessageSent(saved.id, {
+        (await db.markCustomerMessageSent(saved.id, {
           channel: 'whatsapp',
           sendMethod: 'whatsapp_image'
-        }) || saved;
+        })) || saved;
     }
 
     messageRecords.push(messageRecord);
@@ -1080,8 +1061,8 @@ app.post('/api/admin/orders/:id/send-bill-image', requireAdmin, async (req, res)
   });
 });
 
-app.get('/api/admin/orders/:id/bill.svg', requireAdmin, (req, res) => {
-  const order = db.getOrderById(req.params.id);
+app.get('/api/admin/orders/:id/bill.svg', requireAdmin, async (req, res) => {
+  const order = await db.getOrderById(req.params.id);
   if (!order) {
     return res.status(404).send('Order not found');
   }
@@ -1091,12 +1072,12 @@ app.get('/api/admin/orders/:id/bill.svg', requireAdmin, (req, res) => {
   res.send(bill.svg);
 });
 
-app.get('/api/admin/orders/:id/bill.json', requireAdmin, (req, res) => {
-  const order = db.getOrderById(req.params.id);
+app.get('/api/admin/orders/:id/bill.json', requireAdmin, async (req, res) => {
+  const order = await db.getOrderById(req.params.id);
   if (!order) {
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
-  const withToken = db.ensureInvoiceToken(order.id) || order;
+  const withToken = (await db.ensureInvoiceToken(order.id)) || order;
   const bill = buildBill(withToken);
   const invoiceUrl = buildInvoiceDownloadUrl(req, withToken.invoiceToken);
   const caption = buildWhatsAppBillCaption(withToken);
@@ -1128,9 +1109,9 @@ app.get('/api/admin/orders/:id/bill.json', requireAdmin, (req, res) => {
   });
 });
 
-app.patch('/api/admin/orders/:id/status', requireAdmin, (req, res) => {
+app.patch('/api/admin/orders/:id/status', requireAdmin, async (req, res) => {
   const { status } = req.body;
-  const order = db.updateOrderStatus(req.params.id, status);
+  const order = await db.updateOrderStatus(req.params.id, status);
 
   if (!order) {
     return res.status(400).json({ success: false, message: 'Invalid order or status' });
@@ -1363,8 +1344,8 @@ function renderInvoicePage(order, bill, token, pageUrl = '') {
 </html>`;
 }
 
-function sendInvoiceView(req, res, token) {
-  const order = db.getOrderByInvoiceToken(token);
+async function sendInvoiceView(req, res, token) {
+  const order = await db.getOrderByInvoiceToken(token);
   if (!order) {
     return res.status(404).send('Invoice not found or link expired.');
   }
@@ -1376,8 +1357,8 @@ function sendInvoiceView(req, res, token) {
 }
 
 // Pretty "Download Invoice" link — opens bill VIEW page (not a direct file download)
-app.get('/Download-Invoice/:token', (req, res) => {
-  sendInvoiceView(req, res, req.params.token);
+app.get('/Download-Invoice/:token', async (req, res) => {
+  await sendInvoiceView(req, res, req.params.token);
 });
 
 app.get('/invoice/:token', (req, res) => {
@@ -1385,8 +1366,8 @@ app.get('/invoice/:token', (req, res) => {
   res.redirect(302, `/Download-Invoice/${encodeURIComponent(req.params.token)}`);
 });
 
-app.get('/Download-Invoice/:token/save', (req, res) => {
-  const order = db.getOrderByInvoiceToken(req.params.token);
+app.get('/Download-Invoice/:token/save', async (req, res) => {
+  const order = await db.getOrderByInvoiceToken(req.params.token);
   if (!order) {
     return res.status(404).send('Invoice not found');
   }

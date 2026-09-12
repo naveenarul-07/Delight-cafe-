@@ -107,27 +107,27 @@ function createApp() {
     if (isHealth) return next();
 
     try {
-      await db.initMysql();
+      await db.initMongo();
       next();
     } catch (err) {
       console.error('DB init failed:', err);
       res.status(500).json({
         success: false,
-        message: db.formatMysqlError ? db.formatMysqlError(err) : err.message,
-        env: db.describeMysqlEnv ? db.describeMysqlEnv() : {}
+        message: db.formatMongoError ? db.formatMongoError(err) : err.message,
+        env: db.describeMongoEnv ? db.describeMongoEnv() : {}
       });
     }
   });
 
   app.get('/health', async (req, res) => {
     try {
-      await db.initMysql();
-      const env = db.describeMysqlEnv ? db.describeMysqlEnv() : {};
+      await db.initMongo();
+      const env = db.describeMongoEnv ? db.describeMongoEnv() : {};
       res.json({
         success: true,
         status: 'ok',
         time: new Date().toISOString(),
-        db: db.engine || env.mode || (db.hasMysqlEnv && db.hasMysqlEnv() ? 'mysql' : 'sqlite'),
+        db: db.engine || env.mode || 'mongodb',
         env
       });
     } catch (err) {
@@ -135,8 +135,8 @@ function createApp() {
         success: false,
         status: 'db-error',
         time: new Date().toISOString(),
-        message: db.formatMysqlError ? db.formatMysqlError(err) : err.message,
-        env: db.describeMysqlEnv ? db.describeMysqlEnv() : {}
+        message: db.formatMongoError ? db.formatMongoError(err) : err.message,
+        env: db.describeMongoEnv ? db.describeMongoEnv() : {}
       });
     }
   });

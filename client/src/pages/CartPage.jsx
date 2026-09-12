@@ -102,7 +102,10 @@ export default function CartPage() {
             <strong>{formatRupee(total)}</strong>
           </div>
           <div className="cta">
-            <a className="btn" href="/checkout.html">
+            <a
+              className="btn"
+              href={import.meta.env.DEV ? 'http://localhost:8080/checkout.html' : '/checkout.html'}
+            >
               Continue to checkout
             </a>
             <button type="button" className="btn ghost" onClick={clear}>
