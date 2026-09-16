@@ -1,0 +1,21 @@
+{
+  "name": "Delight Cafe",
+  "install": "bash .cursor/install.sh",
+  "start": "bash .cursor/start.sh",
+  "terminals": [
+    {
+      "name": "server",
+      "command": "npm start",
+      "description": "Express backend + static site + React app, served at http://localhost:8080 (API under /api)."
+    },
+    {
+      "name": "client",
+      "command": "npm --prefix client run dev",
+      "description": "Vite dev server for the React client with HMR at http://localhost:5173/app/ (proxies /api to :8080)."
+    }
+  ],
+  "ports": [
+    { "name": "web", "port": 8080 },
+    { "name": "vite", "port": 5173 }
+  ]
+}
