@@ -5,8 +5,8 @@
   "terminals": [
     {
       "name": "server",
-      "command": "npm start",
-      "description": "Express backend + static site + React app, served at http://localhost:8080 (API under /api)."
+      "command": "bash .cursor/start.sh && npm start",
+      "description": "Ensures the local MongoDB is running, then starts the Express backend + static site + React app at http://localhost:8080 (API under /api)."
     },
     {
       "name": "client",
