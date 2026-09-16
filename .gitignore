@@ -1,7 +1,10 @@
 node_modules/
-db/*.db
-users.json
+dist/
 .env
 *.log
+.DS_Store
+.vite/
 bills/
 sms-outbox/
+db/*.db
+users.json
