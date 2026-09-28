@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const { MongoClient } = require('mongodb');
 const { MENU_VERSION } = require('./menu-catalog');
 const { loadMenuFromFolder, getMenuCategories } = require('./load-menu');
@@ -7,8 +9,32 @@ let client;
 let database;
 let readyPromise;
 
-function hasMongoEnv() { return Boolean(process.env.MONGODB_URI); }
-function describeMongoEnv() { return { mode: 'mongodb', hasMongoUri: hasMongoEnv(), database: process.env.MONGODB_DB || 'delight_cafe', hasSessionSecret: Boolean(process.env.SESSION_SECRET) }; }
+function loadDotEnv() {
+  try {
+    const envPath = path.join(__dirname, '..', '.env');
+    if (!fs.existsSync(envPath)) return;
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const idx = trimmed.indexOf('=');
+      if (idx <= 0) continue;
+      const key = trimmed.slice(0, idx).trim();
+      const value = trimmed.slice(idx + 1).trim();
+      if (!process.env[key]) process.env[key] = value;
+    }
+  } catch (_) {
+    // Ignore absent or unreadable local env files.
+  }
+}
+
+loadDotEnv();
+
+function getMongoUri() {
+  return process.env.MONGODB_URI || process.env.MONDODB_URI || '';
+}
+function hasMongoEnv() { return Boolean(getMongoUri()); }
+function describeMongoEnv() { return { mode: 'mongodb', hasMongoUri: hasMongoEnv(), database: process.env.MONGODB_DB || 'delight_cafe', hasSessionSecret: Boolean(process.env.SESSION_SECRET), mongoUriKey: process.env.MONGODB_URI ? 'MONGODB_URI' : process.env.MONDODB_URI ? 'MONDODB_URI' : 'missing' }; }
 function formatMongoError(err) { return err?.code === 'MONGODB_URI_MISSING' ? err.message : `MongoDB connection failed: ${err?.message || 'unknown error'}`; }
 function collection(name) { if (!database) throw new Error('MongoDB is not initialized'); return database.collection(name); }
 async function nextId(name) {
@@ -23,8 +49,16 @@ function normalizeAuthIdentifier(raw) { const value = String(raw || '').trim(); 
 async function initMongo() {
   if (readyPromise) return readyPromise;
   readyPromise = (async () => {
-    if (!hasMongoEnv()) { const error = new Error('MONGODB_URI is required. Set MONGODB_URI and redeploy.'); error.code = 'MONGODB_URI_MISSING'; throw error; }
-    client = new MongoClient(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000 });
+    const mongoUri = getMongoUri();
+    if (!mongoUri) {
+      const error = new Error('MONGODB_URI is required. Set MONGODB_URI in Netlify/hosting settings and redeploy.');
+      error.code = 'MONGODB_URI_MISSING';
+      throw error;
+    }
+    if (!process.env.MONGODB_URI && process.env.MONDODB_URI) {
+      process.env.MONGODB_URI = process.env.MONDODB_URI;
+    }
+    client = new MongoClient(mongoUri, { serverSelectionTimeoutMS: 10000 });
     await client.connect();
     database = client.db(process.env.MONGODB_DB || undefined);
     await Promise.all([
